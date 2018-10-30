@@ -9,6 +9,7 @@ import (
 func TestProcess(t *testing.T) {
 	hits := process(t)
 	fmt.Println(hits)
+	fmt.Println(count)
 }
 
 func BenchmarkProcess(b *testing.B) {

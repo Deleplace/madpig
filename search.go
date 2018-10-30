@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var count = make(map[string]int)
+
 func webpageFindWords(url string, words []string) (hits []string, err error) {
 	for _, word := range words {
 		found, err := webpageContains(url, word)
@@ -28,6 +30,7 @@ func webpageContains(url string, word string) (bool, error) {
 }
 
 func fileContains(filepath string, word string) (bool, error) {
+	count["fileContains"]++
 	size, err := filesize(filepath)
 	if err != nil {
 		return false, err
@@ -35,6 +38,7 @@ func fileContains(filepath string, word string) (bool, error) {
 
 positions:
 	for i := int64(0); i < size-int64(len(word)); i++ {
+		count["os.Open"]++
 		file, err := os.Open(filepath)
 		if err != nil {
 			return false, err
