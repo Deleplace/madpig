@@ -2,7 +2,6 @@ package madpig
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 )
 
@@ -43,12 +42,4 @@ var words = []string{
 	"concurrency",
 	"gromit",
 	"deoxyribonucleic",
-}
-
-// e.g. "https://en.wikipedia.org/wiki/Go_(programming_language)" -> "Go (programming language)"
-func articleName(wikipediaURL string) string {
-	parts := strings.Split(wikipediaURL, "/")
-	last := parts[len(parts)-1]
-	name := strings.Replace(last, "_", " ", -1)
-	return name
 }

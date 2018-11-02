@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 func webpageFindWords(url string, words []string) (hits []string, err error) {
@@ -84,4 +85,12 @@ func readByte(r io.Reader) (byte, error) {
 	buffer := make([]byte, 1)
 	_, err := r.Read(buffer)
 	return buffer[0], err
+}
+
+// e.g. "https://en.wikipedia.org/wiki/Go_(programming_language)" -> "Go (programming language)"
+func articleName(wikipediaURL string) string {
+	parts := strings.Split(wikipediaURL, "/")
+	last := parts[len(parts)-1]
+	name := strings.Replace(last, "_", " ", -1)
+	return name
 }
