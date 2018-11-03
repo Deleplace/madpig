@@ -8,8 +8,12 @@ import (
 )
 
 func webpageFindWords(url string, words []string) (hits []string, err error) {
+	tmpfile, err := download(url)
+	if err != nil {
+		return nil, err
+	}
 	for _, word := range words {
-		found, err := webpageContains(url, word)
+		found, err := fileContains(tmpfile, word)
 		if err != nil {
 			return hits, err
 		}
@@ -18,14 +22,6 @@ func webpageFindWords(url string, words []string) (hits []string, err error) {
 		}
 	}
 	return hits, nil
-}
-
-func webpageContains(url string, word string) (bool, error) {
-	tmpfile, err := download(url)
-	if err != nil {
-		return false, err
-	}
-	return fileContains(tmpfile, word)
 }
 
 func fileContains(filepath string, word string) (bool, error) {
