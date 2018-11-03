@@ -1,8 +1,8 @@
 package madpig
 
 import (
-	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -29,29 +29,18 @@ func webpageContains(url string, word string) (bool, error) {
 }
 
 func fileContains(filepath string, word string) (bool, error) {
-	wordBytes := []byte(word)
 	size, err := filesize(filepath)
 	if err != nil {
 		return false, err
 	}
 
-	file, err := os.Open(filepath)
+	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return false, err
 	}
-	defer file.Close()
-	for i := int64(0); i < size-int64(len(word)); i++ {
-		_, err = file.Seek(i, 0)
-		if err != nil {
-			return false, err
-		}
-
-		buffer := make([]byte, len(word))
-		_, err := file.Read(buffer)
-		if err != nil {
-			return false, err
-		}
-		if bytes.Equal(buffer, wordBytes) {
+	m := len(word)
+	for i := 0; i < int(size)-m; i++ {
+		if string(data[i:i+m]) == word {
 			return true, nil
 		}
 	}
