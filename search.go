@@ -34,34 +34,30 @@ func fileContains(filepath string, word string) (bool, error) {
 		return false, err
 	}
 
+	file, err := os.Open(filepath)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
 positions:
 	for i := int64(0); i < size-int64(len(word)); i++ {
-		file, err := os.Open(filepath)
-		if err != nil {
-			return false, err
-		}
-
 		_, err = file.Seek(i, 0)
 		if err != nil {
-			file.Close()
 			return false, err
 		}
 
 		for j := 0; j < len(word); j++ {
 			c1, err := readByte(file)
 			if err != nil {
-				file.Close()
 				return false, err
 			}
 			c2 := word[j]
 			if c1 != c2 {
 				// Word was not exactly found at position i
-				file.Close()
 				continue positions
 			}
 		}
 		// All characters match!!
-		file.Close()
 		return true, nil
 	}
 	// No position i was a match
