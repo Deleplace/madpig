@@ -2,7 +2,6 @@ package madpig
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strings"
 )
@@ -46,11 +45,13 @@ positions:
 			return false, err
 		}
 
+		buffer := make([]byte, len(word))
+		_, err := file.Read(buffer)
+		if err != nil {
+			return false, err
+		}
 		for j := 0; j < len(word); j++ {
-			c1, err := readByte(file)
-			if err != nil {
-				return false, err
-			}
+			c1 := buffer[j]
 			c2 := word[j]
 			if c1 != c2 {
 				// Word was not exactly found at position i
@@ -75,12 +76,6 @@ func filesize(filepath string) (int64, error) {
 		return 0, err
 	}
 	return info.Size(), nil
-}
-
-func readByte(r io.Reader) (byte, error) {
-	buffer := make([]byte, 1)
-	_, err := r.Read(buffer)
-	return buffer[0], err
 }
 
 // e.g. "https://en.wikipedia.org/wiki/Go_(programming_language)" -> "Go (programming language)"
