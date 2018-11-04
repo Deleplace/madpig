@@ -27,23 +27,11 @@ func webpageFindWords(url string, words []string) (hits []string, err error) {
 
 func fileContains(filepath string, word string) (bool, error) {
 	wordBytes := []byte(word)
-	size, err := filesize(filepath)
-	if err != nil {
-		return false, err
-	}
-
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return false, err
 	}
-	m := len(word)
-	for i := 0; i < int(size)-m; i++ {
-		if bytes.Equal(data[i:i+m], wordBytes) {
-			return true, nil
-		}
-	}
-	// No position i was a match
-	return false, nil
+	return bytes.Contains(data, wordBytes), nil
 }
 
 func filesize(filepath string) (int64, error) {
