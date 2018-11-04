@@ -1,6 +1,7 @@
 package madpig
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,6 +26,7 @@ func webpageFindWords(url string, words []string) (hits []string, err error) {
 }
 
 func fileContains(filepath string, word string) (bool, error) {
+	wordBytes := []byte(word)
 	size, err := filesize(filepath)
 	if err != nil {
 		return false, err
@@ -36,7 +38,7 @@ func fileContains(filepath string, word string) (bool, error) {
 	}
 	m := len(word)
 	for i := 0; i < int(size)-m; i++ {
-		if string(data[i:i+m]) == word {
+		if bytes.Equal(data[i:i+m], wordBytes) {
 			return true, nil
 		}
 	}
