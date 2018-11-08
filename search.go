@@ -13,13 +13,17 @@ func webpageFindWords(url string, words []string) (hits []string, err error) {
 	if err != nil {
 		return nil, err
 	}
+	return fileFindWords(tmpfile, words)
+}
+
+func fileFindWords(filepath string, words []string) (hits []string, err error) {
 	for _, word := range words {
-		found, err := fileContains(tmpfile, word)
+		found, err := fileContains(filepath, word)
 		if err != nil {
 			return hits, err
 		}
 		if found {
-			hits = append(hits, fmt.Sprintf("Article %q contains %q :) \n", articleName(url), word))
+			hits = append(hits, fmt.Sprintf("File %q contains %q :) \n", filepath, word))
 		}
 	}
 	return hits, nil
