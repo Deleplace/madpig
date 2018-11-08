@@ -64,6 +64,34 @@ func BenchmarkProcessDocuments(b *testing.B) {
 	}
 }
 
+func BenchmarkProcessDocumentsConcurrentWords(b *testing.B) {
+	buffers := make([][]byte, len(testfiles))
+	for i, filepath := range testfiles {
+		data, err := ioutil.ReadFile(filepath)
+		if err != nil {
+			b.Fatal(err)
+		}
+		buffers[i] = data
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		var wg sync.WaitGroup
+		wg.Add(len(buffers) * len(words))
+		for j := range buffers {
+			for k := range words {
+				doc, word := buffers[j], words[k]
+				go func() {
+					found := documentContains(doc, word)
+					_ = found
+					wg.Done()
+				}()
+			}
+		}
+		wg.Wait()
+	}
+}
+
 func process(t testing.TB) (allhits map[string][]string) {
 	allhits = make(map[string][]string, len(testfiles))
 	for _, url := range pageURLs {
