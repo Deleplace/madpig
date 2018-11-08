@@ -3,6 +3,7 @@ package madpig
 import (
 	"fmt"
 	"io/ioutil"
+	"sync"
 	"testing"
 )
 
@@ -20,6 +21,13 @@ func TestProcessFiles(t *testing.T) {
 	}
 }
 
+func TestProcessConcurrent(t *testing.T) {
+	hits := processConcurrent(t)
+	for url, filehits := range hits {
+		fmt.Println(url, "contains", filehits)
+	}
+}
+
 func BenchmarkProcess(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		process(b)
@@ -29,6 +37,11 @@ func BenchmarkProcess(b *testing.B) {
 func BenchmarkProcessFiles(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		processFiles(b)
+	}
+}
+func BenchmarkProcessConcurrent(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		processConcurrent(b)
 	}
 }
 
@@ -61,6 +74,29 @@ func process(t testing.TB) (allhits map[string][]string) {
 		}
 		allhits[url] = hits
 	}
+	return allhits
+}
+
+func processConcurrent(t testing.TB) (allhits map[string][]string) {
+	allhits = make(map[string][]string, len(testfiles))
+	var m sync.Mutex
+	var wg sync.WaitGroup
+	for _, url := range pageURLs {
+		url := url
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			hits, err := webpageFindWords(url, words)
+			m.Lock()
+			defer m.Unlock()
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			allhits[url] = hits
+		}()
+	}
+	wg.Wait()
 	return allhits
 }
 
