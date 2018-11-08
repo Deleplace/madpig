@@ -2,7 +2,6 @@ package madpig
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -23,7 +22,7 @@ func fileFindWords(filepath string, words []string) (hits []string, err error) {
 			return hits, err
 		}
 		if found {
-			hits = append(hits, fmt.Sprintf("File %q contains %q :) \n", filepath, word))
+			hits = append(hits, word)
 		}
 	}
 	return hits, nil

@@ -7,12 +7,16 @@ import (
 
 func TestProcess(t *testing.T) {
 	hits := process(t)
-	fmt.Println(hits)
+	for url, filehits := range hits {
+		fmt.Println(url, "contains", filehits)
+	}
 }
 
 func TestProcessFiles(t *testing.T) {
 	hits := processFiles(t)
-	fmt.Println(hits)
+	for filepath, filehits := range hits {
+		fmt.Println(filepath, "contains", filehits)
+	}
 }
 
 func BenchmarkProcess(b *testing.B) {
@@ -27,26 +31,28 @@ func BenchmarkProcessFiles(b *testing.B) {
 	}
 }
 
-func process(t testing.TB) (allhits []string) {
+func process(t testing.TB) (allhits map[string][]string) {
+	allhits = make(map[string][]string, len(testfiles))
 	for _, url := range pageURLs {
 		hits, err := webpageFindWords(url, words)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
-		allhits = append(allhits, hits...)
+		allhits[url] = hits
 	}
 	return allhits
 }
 
-func processFiles(t testing.TB) (allhits []string) {
+func processFiles(t testing.TB) (allhits map[string][]string) {
+	allhits = make(map[string][]string, len(testfiles))
 	for _, filepath := range testfiles {
 		hits, err := fileFindWords(filepath, words)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
-		allhits = append(allhits, hits...)
+		allhits[filepath] = hits
 	}
 	return allhits
 }
