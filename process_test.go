@@ -2,6 +2,7 @@ package madpig
 
 import (
 	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
@@ -28,6 +29,25 @@ func BenchmarkProcess(b *testing.B) {
 func BenchmarkProcessFiles(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		processFiles(b)
+	}
+}
+
+func BenchmarkProcessDocuments(b *testing.B) {
+	buffers := make([][]byte, len(testfiles))
+	for i, filepath := range testfiles {
+		data, err := ioutil.ReadFile(filepath)
+		if err != nil {
+			b.Fatal(err)
+		}
+		buffers[i] = data
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for _, doc := range buffers {
+			hits := documentFindWords(doc, words)
+			_ = hits
+		}
 	}
 }
 

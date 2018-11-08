@@ -28,13 +28,27 @@ func fileFindWords(filepath string, words []string) (hits []string, err error) {
 	return hits, nil
 }
 
+func documentFindWords(doc []byte, words []string) (hits []string) {
+	for _, word := range words {
+		found := documentContains(doc, word)
+		if found {
+			hits = append(hits, word)
+		}
+	}
+	return hits
+}
+
 func fileContains(filepath string, word string) (bool, error) {
-	wordBytes := []byte(word)
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return false, err
 	}
-	return bytes.Contains(data, wordBytes), nil
+	return documentContains(data, word), nil
+}
+
+func documentContains(doc []byte, word string) bool {
+	wordBytes := []byte(word)
+	return bytes.Contains(doc, wordBytes)
 }
 
 func filesize(filepath string) (int64, error) {
